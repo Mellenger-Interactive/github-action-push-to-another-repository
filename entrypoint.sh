@@ -16,6 +16,7 @@ TARGET_BRANCH="${9}"
 COMMIT_MESSAGE="${10}"
 TARGET_DIRECTORY="${11}"
 CREATE_TARGET_BRANCH_IF_NEEDED="${12}"
+EXCLUDE_FROM="${13}"
 
 if [ -z "$DESTINATION_REPOSITORY_USERNAME" ]
 then
@@ -129,7 +130,13 @@ then
 fi
 
 echo "[+] Copying contents of source repository folder $SOURCE_DIRECTORY to folder $TARGET_DIRECTORY in git repo $DESTINATION_REPOSITORY_NAME"
-cp -ra "$SOURCE_DIRECTORY"/. "$CLONE_DIR/$TARGET_DIRECTORY"
+if [ -n "$EXCLUDE_FROM" ]
+then
+	echo "[+] Using rsync with --exclude-from=$EXCLUDE_FROM"
+	rsync -a --exclude-from="$EXCLUDE_FROM" "$SOURCE_DIRECTORY"/ "$CLONE_DIR/$TARGET_DIRECTORY"
+else
+	cp -ra "$SOURCE_DIRECTORY"/. "$CLONE_DIR/$TARGET_DIRECTORY"
+fi
 cd "$CLONE_DIR"
 
 echo "[+] Files that will be pushed"
